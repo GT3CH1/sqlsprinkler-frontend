@@ -1,8 +1,8 @@
 // Copyright 2021 Gavin Pease
-
+console.log(sprinklerSystemAPI);
 function getZoneData() {
     zoneStatus = "";
-    $.get('../lib/api.php?systems').done(function (data) {
+    $.get(sprinklerSystemAPI + '/zones/status').done(function (data) {
         zoneStatus = JSON.parse(data);
         buildZoneTable();
         updateZoneTable();
@@ -14,7 +14,7 @@ function getZoneData() {
 $(document).ready(function () {
     loadTable = true;
     window.deleteMode = false;
-    getZoneData();
+    getSystemUUID(getZoneData);
     $("#settings-table").sortable({
         update: onReorder
     });
