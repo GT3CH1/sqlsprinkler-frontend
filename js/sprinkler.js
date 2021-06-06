@@ -2,20 +2,9 @@
 let zoneStatus = "";
 let systemEnabled;
 let loadTable = true;
-let systemUUID = "";
-let sprinklerSystemAPI = "";
-let sprinklerZoneAPI = "";
-function getSystemUUID() {
-    let userUUID = $.cookie('pimationuseruuid');
-    $.get('http://localhost:5000/api/user/' + userUUID, function (data) {
-        systemUUID = JSON.parse(data)["uuid"];
-        sprinklerSystemAPI = 'http://localhost:5000/api/systems/' + systemUUID;
-        sprinklerZoneAPI = 'http://localhost:5000/api/zone/' + systemUUID;
-    })
-}
 
 function getZoneData() {
-    $.get(sprinklerSystemAPI + '/status').done(function (data) {
+    $.get('lib/api.php?systemstatus', function (data) {
         systemEnabled = JSON.parse(data)["systemenabled"];
         if (systemEnabled) {
             $("#schedule").html("On");
@@ -27,7 +16,7 @@ function getZoneData() {
             $("#schedule-btn-txt").html("Disabled");
         }
     });
-    $.get(sprinklerSystemAPI + '/zones/status').done(function (data) {
+    $.get('lib/api.php?systems').done(function (data) {
         zoneStatus = JSON.parse(data);
         if (loadTable)
             buildZoneTable();
@@ -53,7 +42,6 @@ function updateZoneTable() {
 }
 
 $(document).ready(function () {
-    getSystemUUID();
     $("#menuopen").click(function () {
         $("#menuopen").fadeOut(250, function () {
             $('#menunav').fadeIn(250);
@@ -106,9 +94,15 @@ function sendData(index) {
     let xhttp = new XMLHttpRequest();
     const toggle = ((zoneStatus[index]["status"]) ? "off" : "on");
     let gpio = zoneStatus[index]["gpio"];
-    $.get(sprinklerZoneAPI + '/' + gpio + '/' +toggle).done(function (returns) {
+    data = {
+        gpio: gpio,
+        state: toggle
+    }
+    console.log(data);
+    $.post('lib/api.php', data).done(function (returns) {
         console.log(returns);
     });
+
 }
 
 
