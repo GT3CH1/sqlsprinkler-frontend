@@ -17,7 +17,6 @@ if (isset($_GET['systemstatus']))
 $dir = getcwd() . "/";
 
 if (isset($_POST['state'])) {
-    echo "State found";
     switch ($_POST['state']) {
         case "on":
             $run = $_POST['gpio'];
