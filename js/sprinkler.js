@@ -5,16 +5,21 @@ let loadTable = true;
 let systemUUID = "";
 let sprinklerSystemAPI = "";
 let sprinklerZoneAPI = "";
+let userUUID = "";
+
 function getSystemUUID(myFunc) {
-    let userUUID = $.cookie('pimationuseruuid');
-    $.get('http://localhost:5000/api/user/' + userUUID).done(myFunc);
+    userUUID = $.cookie('pimationuseruuid');
+    console.log(userUUID);
+    $.get('http://api.peasenet.com/sprinkler/user/' + userUUID).done(function (data) {
+        systemUUID = JSON.parse(data)["uuid"];
+        console.log(data);
+        sprinklerSystemAPI = 'http://api.peasenet.com/sprinkler/systems/' + systemUUID;
+        sprinklerZoneAPI = 'http://api.peasenet.com/sprinkler/zone/' + systemUUID;
+        console.log(systemUUID);
+        myFunc();
+    });
 }
 
-function setData(data){
-    systemUUID = JSON.parse(data)["uuid"];
-    sprinklerSystemAPI = 'http://localhost:5000/api/systems/' + systemUUID;
-    sprinklerZoneAPI = 'http://localhost:5000/api/zone/' + systemUUID;
-}
 function getZoneData() {
     $.get(sprinklerSystemAPI + '/status').done(function (data) {
         systemEnabled = JSON.parse(data)["systemenabled"];
@@ -28,7 +33,7 @@ function getZoneData() {
             $("#schedule-btn-txt").html("Disabled");
         }
     });
-    $.get(sprinklerSystemAPI + '/zones/status').done(function (data) {
+    $.get(sprinklerZoneAPI + '/status').done(function (data) {
         zoneStatus = JSON.parse(data);
         if (loadTable)
             buildZoneTable();
@@ -54,7 +59,9 @@ function updateZoneTable() {
 }
 
 $(document).ready(function () {
-    getSystemUUID(setData);
+    getSystemUUID(function () {
+        console.log("got uuid");
+    });
     $("#menuopen").click(function () {
         $("#menuopen").fadeOut(250, function () {
             $('#menunav').fadeIn(250);
@@ -66,7 +73,7 @@ $(document).ready(function () {
         });
     });
     $("#schedule-btn").click(function () {
-        $.post('lib/api.php', {systemtoggle: true});
+        $.post(sprinklerSystemAPI + "/toggle", {systemtoggle: true});
     });
     $("#update").click(function () {
         console.log("Sent update request...");
@@ -107,9 +114,10 @@ function sendData(index) {
     let xhttp = new XMLHttpRequest();
     const toggle = ((zoneStatus[index]["status"]) ? "off" : "on");
     let gpio = zoneStatus[index]["gpio"];
-    $.get(sprinklerZoneAPI + '/' + gpio + '/' +toggle).done(function (returns) {
+    $.get(sprinklerZoneAPI + '/' + gpio + '/' + toggle).done(function (returns) {
         console.log(returns);
     });
 }
+
 
 

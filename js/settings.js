@@ -1,20 +1,21 @@
 // Copyright 2021 Gavin Pease
-console.log(sprinklerSystemAPI);
+
 function getZoneData() {
-    zoneStatus = "";
-    $.get(sprinklerSystemAPI + '/zones/status').done(function (data) {
-        zoneStatus = JSON.parse(data);
-        buildZoneTable();
-        updateZoneTable();
-        console.log("Done receiving sprinkler data.");
-        $("#settings-table").delay(100).fadeIn(250);
+    getSystemUUID(function(){
+        $.get(sprinklerZoneAPI + '/status').done(function (data) {
+            zoneStatus = JSON.parse(data);
+            buildZoneTable();
+            updateZoneTable();
+            console.log("Done receiving sprinkler data.");
+            $("#settings-table").delay(100).fadeIn(250);
+        });
     });
 }
 
 $(document).ready(function () {
     loadTable = true;
     window.deleteMode = false;
-    getSystemUUID(getZoneData);
+    getZoneData();
     $("#settings-table").sortable({
         update: onReorder
     });
@@ -66,6 +67,8 @@ function submitChanges() {
         alert("You must set a proper GPIO pin!");
         return;
     }
+    let callback = sprinklerZoneAPI + "/update";
+
     data = {
         contentType: 'application/json',
         dataType: 'json',
@@ -78,7 +81,7 @@ function submitChanges() {
         autooff: autooff
     };
 
-    if (addMode)
+    if (addMode) {
         data = {
             contentType: 'application/json',
             dataType: 'json',
@@ -89,15 +92,18 @@ function submitChanges() {
             scheduled: scheduled,
             autooff: autooff
         };
+        callback = sprinklerZoneAPI + "/add";
+    }
 
     if (deleteMode) {
         data = {
             call: "delete",
             id: id
         }
+        callback = sprinklerZoneAPI + "/delete";
     }
     console.log(data);
-    $.post("../lib/api.php", data).done(function (data) {
+    $.post(callback, data).done(function (data) {
         console.log("Received data: " + data);
         setTimeout(getZoneData, 10);
         fadeEditOut();
@@ -131,7 +137,7 @@ function disableEditing() {
 }
 
 function enableEditing() {
-    if($("#edit-order").hasClass('w3-green')) {
+    if ($("#edit-order").hasClass('w3-green')) {
         disableEditing();
         return;
     }
@@ -155,7 +161,7 @@ function setButtonListener() {
         }
     });
     $("#settings-submit").click(submitChanges);
-    $("#add").click(function(){
+    $("#add").click(function () {
         getData(-1, true);
     });
     $("#back").click(fadeEditOut);
@@ -178,11 +184,11 @@ function onReorder() {
     postdata = {
         contentType: 'application/json',
         dataType: 'json',
-        order: table_json
+        order: JSON.stringify(table_json)
     }
     console.log(postdata);
     $("#settings-table").fadeOut(250);
-    $.post('../lib/api.php', postdata).done(function (data) {
+    $.post(sprinklerZoneAPI + "/reorder", postdata).done(function (data) {
         console.log(data);
         getZoneData();
         $("#settings-table").fadeIn(250);
