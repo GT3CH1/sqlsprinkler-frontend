@@ -9,11 +9,11 @@ let userUUID = "";
 
 function getSystemUUID(myFunc) {
     userUUID = $.cookie('pimationuseruuid');
-    $.get('http://api.peasenet.com/sprinkler/user/' + userUUID).done(function (data) {
+    $.get('https://api.peasenet.com/sprinkler/user/' + userUUID).done(function (data) {
         systemUUID = JSON.parse(data)["uuid"];
         console.log(data);
-        sprinklerSystemAPI = 'http://api.peasenet.com/sprinkler/systems/' + systemUUID;
-        sprinklerZoneAPI = 'http://api.peasenet.com/sprinkler/zone/' + systemUUID;
+        sprinklerSystemAPI = 'https://api.peasenet.com/sprinkler/systems/' + systemUUID;
+        sprinklerZoneAPI = 'https://api.peasenet.com/sprinkler/zone/' + systemUUID;
         myFunc();
     });
 }
