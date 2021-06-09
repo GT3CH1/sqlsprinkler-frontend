@@ -9,13 +9,11 @@ let userUUID = "";
 
 function getSystemUUID(myFunc) {
     userUUID = $.cookie('pimationuseruuid');
-    console.log(userUUID);
     $.get('http://api.peasenet.com/sprinkler/user/' + userUUID).done(function (data) {
         systemUUID = JSON.parse(data)["uuid"];
         console.log(data);
         sprinklerSystemAPI = 'http://api.peasenet.com/sprinkler/systems/' + systemUUID;
         sprinklerZoneAPI = 'http://api.peasenet.com/sprinkler/zone/' + systemUUID;
-        console.log(systemUUID);
         myFunc();
     });
 }
@@ -111,10 +109,9 @@ function buildZoneTable() {
 }
 
 function sendData(index) {
-    let xhttp = new XMLHttpRequest();
     const toggle = ((zoneStatus[index]["status"]) ? "off" : "on");
     let gpio = zoneStatus[index]["gpio"];
-    $.get(sprinklerZoneAPI + '/' + gpio + '/' + toggle).done(function (returns) {
+    $.post(sprinklerZoneAPI + '/' + gpio + '/' + toggle).done(function (returns) {
         console.log(returns);
     });
 }
