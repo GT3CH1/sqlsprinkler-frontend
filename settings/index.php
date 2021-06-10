@@ -1,4 +1,8 @@
 <!-- Copyright 2021 Gavin Pease -->
+<?php
+
+include_once ('../lib/cookie_check.php');
+?>
 <html>
 <head>
     <meta charset="utf-8">
