@@ -24,9 +24,11 @@ cur.execute("SELECT Time, Autooff FROM Systems WHERE gpio=" + str(i))
 # print all the first cell of all the rows
 for row in list(cur.fetchall()):
     print(row[0])
-    autooff=row[1]
+    autooff=row[1]==1
+    print(autooff)
     GPIO.setup(i, GPIO.OUT)
     GPIO.output(i, False)
-    if not autooff:
+    if autooff:
+        print("Auto-enabled, sleeping...")
         time.sleep(row[0]*60)
         GPIO.output(i, True)
