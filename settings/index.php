@@ -1,7 +1,7 @@
 <!-- Copyright 2021 Gavin Pease -->
 <?php
 
-include_once ('../lib/cookie_check.php');
+include_once('../lib/cookie_check.php');
 ?>
 <html>
 <head>
