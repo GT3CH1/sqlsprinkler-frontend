@@ -11,7 +11,7 @@ function getSystemUUID(myFunc) {
     userUUID = $.cookie('pimationuseruuid');
     $.get('https://api.peasenet.com/sprinkler/user/' + userUUID).done(function (data) {
         systemUUID = JSON.parse(data)[0]["deviceUUID"];
-        console.log(data);
+        console.log(data[0]);
         sprinklerSystemAPI = 'https://api.peasenet.com/sprinkler/systems/' + systemUUID;
         sprinklerZoneAPI = 'https://api.peasenet.com/sprinkler/zone/' + systemUUID;
         myFunc();
