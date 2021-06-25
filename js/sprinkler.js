@@ -75,7 +75,7 @@ $(document).ready(function () {
     $("#update").click(function () {
         console.log("Sent update request...");
         $("button").attr("disabled", "disabled");
-        $.get('lib/api.php?update').done(function (data) {
+        $.get(sprinklerSystemAPI + "/update").done(function (data) {
             console.log("Response -> " + data);
             $("#notification-text").html("Done checking for updates. Check log for more information.");
             $("#notification").fadeIn("slow");
