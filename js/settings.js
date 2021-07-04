@@ -16,10 +16,8 @@ $(document).ready(function () {
     loadTable = true;
     window.deleteMode = false;
     getZoneData();
-    $('#settings-table').sortable('disable', {
-        'disable': 'disable',
-        update: onReorder,
-    });
+    $('#settings-table').sortable();
+    $('#settings-table').sortable("option", {disabled: true, update: onReorder});
 });
 
 function getData(id, add) {
@@ -132,7 +130,7 @@ function createEditRow(index) {
 }
 
 function disableEditing() {
-    $("#settings-table").sortable("disable");
+    $('#settings-table').sortable("option", {disabled: true});
     $("#edit-order").removeClass('w3-green w3-hover-green');
 }
 
@@ -141,7 +139,7 @@ function enableEditing() {
         disableEditing();
         return;
     } else {
-        $("#settings-table").sortable("enable");
+        $('#settings-table').sortable("option", {disabled: false, update: onReorder});
         $("#edit-order").addClass('w3-green w3-hover-green');
     }
 }
@@ -176,11 +174,11 @@ function buildZoneTable() {
 }
 
 function onReorder() {
-    let table_json = {};
+    let table_json = [];
     let counter = 0;
     $(".draggable").each(function () {
-        let name = $(this).attr('zoneid');
-        table_json[counter++] = parseInt(name);
+        table_json.push(counter++);
+        console.log(counter);
     });
     postdata = {
         contentType: 'application/json',
