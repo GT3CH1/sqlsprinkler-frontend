@@ -19,7 +19,7 @@ function getSystemUUID(myFunc) {
 
 function getZoneData() {
     $.get(sprinklerSystemAPI + '/status').done(function (data) {
-        systemEnabled = JSON.parse(data)["systemenabled"];
+        systemEnabled = JSON.parse(data)["system_enabled"];
         if (systemEnabled) {
             $("#schedule").html("On");
             $("#schedule-btn-txt").html("Enabled");
@@ -45,7 +45,7 @@ function updateZoneTable() {
         let name_id, i;
         for (i = 0; i < zoneStatus.length; i++) {
             button_id = zoneStatus[i]["gpio"];
-            name_id = !zoneStatus[i]["status"] ? "On" : "Off";
+            name_id = !zoneStatus[i]["state"] ? "On" : "Off";
             document.getElementById("status-button-" + i).innerHTML = name_id;
             if (name_id === "Off")
                 $("#" + button_id).removeClass("systemoff").addClass("systemon");
@@ -70,7 +70,7 @@ $(document).ready(function () {
         });
     });
     $("#schedule-btn").click(function () {
-        $.post(sprinklerSystemAPI + "/toggle", {systemtoggle: true});
+        $.post(sprinklerSystemAPI + "/toggle/" + !systemEnabled);
     });
     $("#update").click(function () {
         console.log("Sent update request...");
@@ -94,9 +94,9 @@ function buildZoneTable() {
         let name = zoneData['name'];
         let gpio = zoneData['gpio'];
         let enabled = zoneData['enabled'] ? "" : "unscheduled";
-        let autooff = zoneData['autooff'] ? "" : "italic"
-        let on = zoneData['status'] ? "Off" : "On";
-        let zoneCss = zoneData['status'] ? "systemon" : "systemoff";
+        let autooff = zoneData['auto_off'] ? "" : "italic"
+        let on = !zoneData['state'] ? "On" : "Off";
+        let zoneCss = zoneData['state'] ? "systemon" : "systemoff";
         tr += "<tr><td><div class='sprinkler-info'><p class='sprinkler-name " + autooff + " " + enabled + "'>Zone " + (i + 1) + "</p>"
         tr += "<p> " + name + " </p></div></td>"
         tr += "<td><div class='sprinkler-button'><button id='" + gpio + "' name='toggle' onclick='sendData(" + i + ");";
@@ -108,9 +108,8 @@ function buildZoneTable() {
 }
 
 function sendData(index) {
-    const toggle = ((zoneStatus[index]["status"]) ? "off" : "on");
-    let gpio = zoneStatus[index]["gpio"];
-    $.post(sprinklerZoneAPI + '/' + gpio + '/' + toggle).done(function (returns) {
+    const toggle = ((zoneStatus[index]["state"]) ? "off" : "on");
+    $.post(sprinklerZoneAPI + '/' + index + '/' + toggle).done(function (returns) {
         console.log(returns);
     });
 }
