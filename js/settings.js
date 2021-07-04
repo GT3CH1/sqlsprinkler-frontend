@@ -20,6 +20,22 @@ $(document).ready(function () {
     $('#settings-table').sortable("option", {disabled: true, update: onReorder});
 });
 
+$.postJSON = function (url, data, callback) {
+    return jQuery.ajax({
+        'type': 'POST',
+        'url': url,
+        'contentType': 'application/json',
+        'data': JSON.stringify(data),
+        'dataType': 'json',
+        'async': true,
+        'success': callback(),
+        error: function (xhr, error) {
+            console.debug(xhr);
+            console.debug(error);
+        },
+    });
+};
+
 function getData(id, add) {
     $("#settings-table").fadeOut(500);
     if (add) {
@@ -33,12 +49,12 @@ function getData(id, add) {
         setTimeout(function () {
             $("#zone-name").val(zoneStatus[id]["name"]);
             $("#zone-gpio").val(zoneStatus[id]["gpio"]);
-            $("#zone-runtime").val(zoneStatus[id]["runtime"]);
+            $("#zone-runtime").val(zoneStatus[id]["time"]);
             $("#zone-id").val(zoneStatus[id]["id"]);
             $("#zone-number").val(id);
             $("#zone-delete").val(id);
             $("#zone-enabled").prop("checked", zoneStatus[id]["enabled"]);
-            $("#zone-autooff").prop("checked", zoneStatus[id]["autooff"]);
+            $("#zone-autooff").prop("checked", zoneStatus[id]["auto_off"]);
             console.log(zoneStatus[id]["id"]);
             window.addMode = false;
         }, 250);
@@ -53,6 +69,7 @@ function submitChanges() {
     let gpio = $("#zone-gpio").val();
     let scheduled = $("#zone-enabled").prop('checked');
     let autooff = $("#zone-autooff").prop('checked');
+    let order = $("#zone-number").val();
     if (runtime === "")
         runtime = 10;
     if (zonename === "")
@@ -66,45 +83,29 @@ function submitChanges() {
         return;
     }
     let callback = sprinklerZoneAPI + "/update";
-
+    //{
+    //     "name": "Rust-Zone 123",
+    //     "gpio": 12,
+    //     "time": 10,
+    //     "auto_off": true,
+    //     "enabled": true,
+    //     "system_order": 1,
+    //     "id": 4
+    // }
     data = {
-        contentType: 'application/json',
-        dataType: 'json',
-        call: "update",
-        id: id,
-        name: zonename,
-        gpio: gpio,
-        runtime: runtime,
-        scheduled: scheduled,
-        autooff: autooff
+        "name": zonename,
+        "gpio": parseInt(gpio),
+        "time": parseInt(runtime),
+        "auto_off": Boolean(autooff),
+        "enabled": Boolean(scheduled),
+        "system_order": parseInt(order),
+        "id": parseInt(id)
     };
-
-    if (addMode) {
-        data = {
-            contentType: 'application/json',
-            dataType: 'json',
-            call: "add",
-            name: zonename,
-            gpio: gpio,
-            runtime: runtime,
-            scheduled: scheduled,
-            autooff: autooff
-        };
-        callback = sprinklerZoneAPI + "/add";
-    }
-
-    if (deleteMode) {
-        data = {
-            call: "delete",
-            id: id
-        }
-        callback = sprinklerZoneAPI + "/delete";
-    }
-    console.log(data);
-    $.post(callback, data).done(function (data) {
-        console.log("Received data: " + data);
-        setTimeout(getZoneData, 10);
-        fadeEditOut();
+    $.postJSON(callback, data, function () {
+        setTimeout(function () {
+            getZoneData();
+            fadeEditOut();
+        }, 250)
     });
 }
 
@@ -117,8 +118,8 @@ function createEditRow(index) {
     let tr = "";
     let id = zoneStatus[index]['id'];
     let enabled = zoneStatus[index]['enabled'] ? "" : "unscheduled";
-    let autooff = zoneStatus[index]['autooff'] ? "" : "italic"
-    tr += "<tr class='" + enabled + " " + autooff + " draggable' zoneid='" + id + " '> ";
+    let autooff = zoneStatus[index]['auto_off'] ? "" : "italic"
+    tr += "<tr class='" + enabled + " " + autooff + " draggable'  zoneindex='" + index + "' zoneid='" + id + " '> ";
     tr += "<td id='zone-" + id + "-index'></td>";
     tr += "<td id='zone-" + id + "-name' class='w3-hide-small'></td>";
     tr += "<td id='zone-" + id + "-time'></td>";
@@ -177,20 +178,25 @@ function onReorder() {
     let table_json = [];
     let counter = 0;
     $(".draggable").each(function () {
-        table_json.push(counter++);
-        console.log(counter);
+        zoneStatus[$(this).attr('zoneindex')]["system_order"] = counter;
+        counter++;
     });
+    console.log(zoneStatus);
+    for (let i = 0; i < zoneStatus.length; i++) {
+        table_json.push(zoneStatus[i]["system_order"]);
+    }
+    console.log(table_json);
     postdata = {
-        contentType: 'application/json',
-        dataType: 'json',
-        order: JSON.stringify(table_json)
+        order: table_json
     }
     console.log(postdata);
-    $("#settings-table").fadeOut(250);
-    $.post(sprinklerZoneAPI + "/reorder", postdata).done(function (data) {
-        console.log(data);
-        getZoneData();
-        $("#settings-table").fadeIn(250);
+    $.postJSON(sprinklerZoneAPI + "/reorder", postdata, function () {
+        $("#settings-table").fadeOut(250);
+        setTimeout(function () {
+            getZoneData();
+            updateZoneTable();
+            $("#settings-table").fadeIn(250);
+        }, 1000);
     });
 }
 
@@ -198,7 +204,7 @@ function updateZoneTable() {
     for (let i = 0; i < zoneStatus.length; i++) {
         let currSprinkler = zoneStatus[i];
         let currName = currSprinkler['name'];
-        let currTime = currSprinkler['runtime'];
+        let currTime = currSprinkler['time'];
         let currZone = i + 1;
         let id = currSprinkler['id'];
         let zoneExists = $("#zone-" + id + "-index").length !== 0;

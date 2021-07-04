@@ -7,6 +7,17 @@ let sprinklerSystemAPI = "";
 let sprinklerZoneAPI = "";
 let userUUID = "";
 
+$.postJSON = function(url, data, callback) {
+    return jQuery.ajax({
+        'type': 'POST',
+        'url': url,
+        'contentType': 'application/json',
+        'data': JSON.stringify(data),
+        'dataType': 'json',
+        'success': callback
+    });
+};
+
 function getSystemUUID(myFunc) {
     userUUID = $.cookie('pimationuseruuid');
     $.get('https://api.peasenet.com/sprinkler/user/' + userUUID).done(function (data) {
@@ -70,7 +81,10 @@ $(document).ready(function () {
         });
     });
     $("#schedule-btn").click(function () {
-        $.post(sprinklerSystemAPI + "/toggle/" + !systemEnabled);
+        let post_data = {
+            "system_enabled": !systemEnabled
+        }
+        $.postJSON(sprinklerSystemAPI + "/state",post_data);
     });
     $("#update").click(function () {
         console.log("Sent update request...");
