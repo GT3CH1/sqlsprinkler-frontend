@@ -101,6 +101,22 @@ function submitChanges() {
         "system_order": parseInt(order),
         "id": parseInt(id)
     };
+    if(addMode){
+        callback = sprinklerZoneAPI + "/add";
+        data = {
+            "name": zonename,
+            "gpio": parseInt(gpio),
+            "time": parseInt(runtime),
+            "auto_off": Boolean(autooff),
+            "enabled": Boolean(scheduled)
+        }
+    }
+    if(deleteMode) {
+        callback = sprinklerZoneAPI + "/delete";
+        data = {
+            "id": parseInt(id)
+        }
+    }
     $.postJSON(callback, data, function () {
         setTimeout(function () {
             getZoneData();
