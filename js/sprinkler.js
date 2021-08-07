@@ -23,7 +23,6 @@ function getSystemUUID() {
     if (systemUUID === null)
         systemUUID = $.cookie("sqlsprinkleruuid");
     console.log("System UUID " + systemUUID);
-    $.cookie("sqlsprinkleruuid", systemUUID);
     sprinklerSystemAPI = 'https://api.peasenet.com/sprinkler/systems/' + systemUUID;
     sprinklerZoneAPI = 'https://api.peasenet.com/sprinkler/zone/' + systemUUID;
 }
