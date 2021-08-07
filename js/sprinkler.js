@@ -18,12 +18,11 @@ $.postJSON = function (url, data, callback) {
     });
 };
 
-function getSystemUUID(myFunc) {
-        systemUUID = $.urlParam("deviceID");
-        console.log("System UUID " + systemUUID);
-        sprinklerSystemAPI = 'https://api.peasenet.com/sprinkler/systems/' + systemUUID;
-        sprinklerZoneAPI = 'https://api.peasenet.com/sprinkler/zone/' + systemUUID;
-        myFunc();
+function getSystemUUID() {
+    systemUUID = $.urlParam("deviceID");
+    console.log("System UUID " + systemUUID);
+    sprinklerSystemAPI = 'https://api.peasenet.com/sprinkler/systems/' + systemUUID;
+    sprinklerZoneAPI = 'https://api.peasenet.com/sprinkler/zone/' + systemUUID;
 }
 
 function getZoneData() {
@@ -65,9 +64,7 @@ function updateZoneTable() {
 }
 
 $(document).ready(function () {
-    getSystemUUID(function () {
-        console.log("got uuid");
-    });
+    set_init(getSystemUUID());
     $("#menuopen").click(function () {
         $("#menuopen").fadeOut(250, function () {
             $('#menunav').fadeIn(250);
