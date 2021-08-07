@@ -7,7 +7,7 @@ let sprinklerSystemAPI = "";
 let sprinklerZoneAPI = "";
 let userUUID = "";
 
-$.postJSON = function(url, data, callback) {
+$.postJSON = function (url, data, callback) {
     return jQuery.ajax({
         'type': 'POST',
         'url': url,
@@ -19,13 +19,11 @@ $.postJSON = function(url, data, callback) {
 };
 
 function getSystemUUID(myFunc) {
-    userUUID = $.cookie('pimationuseruuid');
-    $.get('https://api.peasenet.com/sprinkler/user/' + userUUID).done(function (data) {
-        systemUUID = JSON.parse(data)[0]["deviceUUID"];
+        systemUUID = $.urlParam("deviceID");
+        console.log("System UUID " + systemUUID);
         sprinklerSystemAPI = 'https://api.peasenet.com/sprinkler/systems/' + systemUUID;
         sprinklerZoneAPI = 'https://api.peasenet.com/sprinkler/zone/' + systemUUID;
         myFunc();
-    });
 }
 
 function getZoneData() {
@@ -84,7 +82,7 @@ $(document).ready(function () {
         let post_data = {
             "system_enabled": !systemEnabled
         }
-        $.postJSON(sprinklerSystemAPI + "/state",post_data);
+        $.postJSON(sprinklerSystemAPI + "/state", post_data);
     });
     $("#update").click(function () {
         console.log("Sent update request...");

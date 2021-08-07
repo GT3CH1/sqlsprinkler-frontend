@@ -12,14 +12,25 @@ include_once('lib/cookie_check.php');
     <link href="css/w3-flat.css" type="text/css" rel="stylesheet"/>
     <link href="css/style.css" type="text/css" rel="stylesheet"/>
     <script src="https://kit.fontawesome.com/e00a151875.js" crossorigin="anonymous"></script>
+    <script src="https://www.gstatic.com/firebasejs/ui/4.8.1/firebase-ui-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-firestore.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="js/jquery.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+    <script src="../../lib/auth.js"></script>
+    <script src="../../lib/urlparam.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
     <script src="js/sprinkler.js"></script>
 </head>
 <body onload="updateZoneTable();" class="w3-light-gray">
 <div>
     <br>
-    <table class="w3-table w3-table-all sprinkler-table w3-threequarter w3-display-topmiddle sprinkler-table" id="sprinklerData">
+    <table class="w3-table w3-table-all sprinkler-table w3-threequarter w3-display-topmiddle sprinkler-table"
+           id="sprinklerData">
         <div id="notification" style="display: none;font-size: .75em;padding:16px;z-index: 100"
              class="w3-card-4 w3-white w3-display-middle">
             <span id="notification-text"></span>
