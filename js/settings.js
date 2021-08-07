@@ -1,21 +1,20 @@
 // Copyright 2021 Gavin Pease
 
 function getZoneData() {
-    getSystemUUID(function () {
-        $.get(sprinklerZoneAPI + '/status').done(function (data) {
-            zoneStatus = JSON.parse(data);
-            buildZoneTable();
-            updateZoneTable();
-            console.log("Done receiving sprinkler data.");
-            $("#settings-table").delay(100).fadeIn(250);
-        });
+    getSystemUUID();
+    $.get(sprinklerZoneAPI + '/status').done(function (data) {
+        zoneStatus = JSON.parse(data);
+        buildZoneTable();
+        updateZoneTable();
+        console.log("Done receiving sprinkler data.");
+        $("#settings-table").delay(100).fadeIn(250);
     });
 }
 
 $(document).ready(function () {
     loadTable = true;
     window.deleteMode = false;
-    getZoneData();
+    set_init(getZoneData);
     $('#settings-table').sortable();
     $('#settings-table').sortable("option", {disabled: true, update: onReorder});
 });
@@ -101,7 +100,7 @@ function submitChanges() {
         "system_order": parseInt(order),
         "id": parseInt(id)
     };
-    if(addMode){
+    if (addMode) {
         callback = sprinklerZoneAPI + "/add";
         data = {
             "name": zonename,
@@ -111,7 +110,7 @@ function submitChanges() {
             "enabled": Boolean(scheduled)
         }
     }
-    if(deleteMode) {
+    if (deleteMode) {
         callback = sprinklerZoneAPI + "/delete";
         data = {
             "id": parseInt(id)

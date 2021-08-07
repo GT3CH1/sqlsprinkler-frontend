@@ -20,7 +20,10 @@ $.postJSON = function (url, data, callback) {
 
 function getSystemUUID() {
     systemUUID = $.urlParam("deviceID");
+    if (systemUUID === null)
+        systemUUID = $.cookie("sqlsprinkleruuid");
     console.log("System UUID " + systemUUID);
+    $.cookie("sqlsprinkleruuid", systemUUID);
     sprinklerSystemAPI = 'https://api.peasenet.com/sprinkler/systems/' + systemUUID;
     sprinklerZoneAPI = 'https://api.peasenet.com/sprinkler/zone/' + systemUUID;
 }
@@ -47,6 +50,7 @@ function getZoneData() {
 }
 
 function updateZoneTable() {
+    $.cookie("deviceUUID", systemUUID);
     setInterval(function () {
         getZoneData();
         let button_id;
@@ -64,7 +68,7 @@ function updateZoneTable() {
 }
 
 $(document).ready(function () {
-    set_init(getSystemUUID());
+    set_init(getSystemUUID);
     $("#menuopen").click(function () {
         $("#menuopen").fadeOut(250, function () {
             $('#menunav').fadeIn(250);
